@@ -1,0 +1,40 @@
+
+spring:
+  kafka:
+    producer:
+      #配置kafka序列化和反序列化
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    #      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+    consumer:
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      #配置默认绑定一为rabbit
+      defaultBinder: rabbit
+      kafka:
+        binder:
+          brokers: 192.168.70.30:6667,192.168.70.31:6667,192.168.70.32:6667
+          zk-nodes: 192.168.70.30:2181,192.168.70.31:2181,192.168.70.32:2181
+      function:
+        definition: sendEmail;receiveEmail;sendMsg;receiveMsg;supplier
+      bindings:
+        sendEmail-out-0:
+          destination: email
+        receiveEmail-in-0:
+          group: email
+          destination: email
+        sendMsg-out-0:
+          binder: kafka
+          destination: msg
+        receiveMsg-in-0:
+          #为不同的消息单独配置绑定器
+          binder: kafka
+          group: msg
+          destination: msg
+server:
+  port: 8083
